@@ -1,0 +1,9 @@
+## Interface: 80300
+## Title: Kleiderschrank
+## Author: Urtgard
+## Version: @project-version@
+## X-Curse-Project-ID: 388565
+## SavedVariables: KleiderschrankDB
+
+embeds.xml
+Kleiderschrank.lua
