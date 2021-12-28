@@ -4,6 +4,7 @@
 ## Version: @project-version@
 ## X-Curse-Project-ID: 388565
 ## SavedVariables: KleiderschrankDB
+## Dependencies: CanIMogIt, AllTheThings
 
 embeds.xml
 Kleiderschrank.lua
