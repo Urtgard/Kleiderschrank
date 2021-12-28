@@ -1,4 +1,4 @@
-## Interface: 80300
+## Interface: 90105
 ## Title: Kleiderschrank
 ## Author: Urtgard
 ## Version: @project-version@

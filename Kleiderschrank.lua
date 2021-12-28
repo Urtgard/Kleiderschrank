@@ -8,8 +8,7 @@ local Kleiderschrank = {}
 
 function K:OnInitialize()
 	local defaults = {
-		factionrealm = {
-		}
+		factionrealm = {}
 	}
 	self.db = LibStub("AceDB-3.0"):New("KleiderschrankDB", defaults)
 end
@@ -38,14 +37,14 @@ end
 
 -- AllTheThings
 local L = {
-	["COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\known:0|t |cff15abffCollected|r";		-- Acquired the colors and icon from CanIMogIt.
-	["COLLECTED_APPEARANCE"] = "|TInterface\\Addons\\AllTheThings\\assets\\known_circle:0|t |cff15abffCollected*|r";	-- Acquired the colors and icon from CanIMogIt.
-	["NOT_COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t |cffff9333Not Collected|r";		-- Acquired the colors and icon from CanIMogIt.
+	["COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\known:0|t |cff15abffCollected|r", -- Acquired the colors and icon from CanIMogIt.
+	["COLLECTED_APPEARANCE"] = "|TInterface\\Addons\\AllTheThings\\assets\\known_circle:0|t |cff15abffCollected*|r", -- Acquired the colors and icon from CanIMogIt.
+	["NOT_COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t |cffff9333Not Collected|r", -- Acquired the colors and icon from CanIMogIt.
 	["NOTHING"] = "Keine Items zum Tauschen"
 }
 
 local function GetCollectionText(state)
-		return L[(state and (state == 2 and "COLLECTED_APPEARANCE" or "COLLECTED")) or "NOT_COLLECTED"];
+	return L[(state and (state == 2 and "COLLECTED_APPEARANCE" or "COLLECTED")) or "NOT_COLLECTED"]
 end
 
 function K:BuildOptionsTable()
@@ -59,56 +58,82 @@ function K:BuildOptionsTable()
 	end
 	self.options = {
 		type = "group",
-		args = {},
+		args = {}
 	}
 
-	for k,itemSubType in pairs({"Stoff", "Leder",	"Kette", "Platte", "Zweihandschwerter",	"Stäbe", "Faustwaffen", "Zweihandäxte",	"Dolche", "Zweihandstreitkolben", "Schusswaffen", "Einhandschwerter", "Zauberstäbe", "Armbrüste", "Bogen", "Stangenwaffen", "Einhandäxte", "Einhandstreitkolben", "Schilde", "Verschiedenes", "Kriegsgleven",}) do
+	for k, itemSubType in pairs(
+		{
+			"Stoff",
+			"Leder",
+			"Kette",
+			"Platte",
+			"Zweihandschwerter",
+			"Stäbe",
+			"Faustwaffen",
+			"Zweihandäxte",
+			"Dolche",
+			"Zweihandstreitkolben",
+			"Schusswaffen",
+			"Einhandschwerter",
+			"Zauberstäbe",
+			"Armbrüste",
+			"Bogen",
+			"Stangenwaffen",
+			"Einhandäxte",
+			"Einhandstreitkolben",
+			"Schilde",
+			"Verschiedenes",
+			"Kriegsgleven"
+		}
+	) do
 		self.options.args[itemSubType] = {
 			name = itemSubType,
 			type = "input",
 			order = newOrder(),
 			--width = .6,
-			set = function(info,val)
-	   			K.db.factionrealm[itemSubType] = (val)
-	   		end,
-	    	get = function() return K.db.factionrealm[itemSubType] end
+			set = function(info, val)
+				K.db.factionrealm[itemSubType] = (val)
+			end,
+			get = function()
+				return K.db.factionrealm[itemSubType]
+			end
 		}
 	end
 end
 
 local n, k, status, offer = 0, 0, false, false
 
-function K:MessageReceived(event, prefix, text, _, sendBy,...)
+function K:MessageReceived(event, prefix, text, _, sendBy, ...)
 	if prefix == "Kleiderschrank" then
 		if text == "REQUEST" then
 			self:SendItems(sendBy)
 		elseif text == "NOTHING" then
 			print(L["NOTHING"])
-		elseif select(3,string.find(text, "OFFER(|.*)")) then
+		elseif select(3, string.find(text, "OFFER(|.*)")) then
 			k = k + 1
 			offer = true
-			text = select(3,string.find(text, "OFFER(|.*)"))
+			text = select(3, string.find(text, "OFFER(|.*)"))
 			local state = ATT.SearchForLink(text)[1].collected
 			if state ~= 1 then
 				if Kleiderschrank:isBoP(text) then
 					if CanIMogIt:CharacterCanLearnTransmog(text) then
 						status = true
-						SendAddonMessage("Kleiderschrank", "ANSWER"..text.." "..GetCollectionText(state), "WHISPER", sendBy)
+						SendAddonMessage("Kleiderschrank", "ANSWER" .. text .. " " .. GetCollectionText(state), "WHISPER", sendBy)
 					end
 				else
 					status = true
-					SendAddonMessage("Kleiderschrank", "ANSWER"..text.." "..GetCollectionText(state), "WHISPER", sendBy)
+					SendAddonMessage("Kleiderschrank", "ANSWER" .. text .. " " .. GetCollectionText(state), "WHISPER", sendBy)
 				end
 			end
-		elseif select(3,string.find(text, "ANSWER(.*)")) then
-			text = select(3,string.find(text, "ANSWER(.*)"))
+		elseif select(3, string.find(text, "ANSWER(.*)")) then
+			text = select(3, string.find(text, "ANSWER(.*)"))
 			print(text)
-		elseif select(3,string.find(text, "N|(.*)")) then
-			n = tonumber(select(3,string.find(text, "N|(.*)")))
+		elseif select(3, string.find(text, "N|(.*)")) then
+			n = tonumber(select(3, string.find(text, "N|(.*)")))
 			if k == n then
 				if (status ~= true) and (n > 0) then
 					if offer == true then
-						SendAddonMessage("Kleiderschrank", "ANSWER"..L["NOTHING"], "WHISPER", sendBy)
+						SendAddonMessage("Kleiderschrank", "ANSWER" .. L["NOTHING"], "WHISPER", sendBy)
 					else
 						print(L["NOTHING"])
 					end
@@ -121,7 +146,7 @@ function K:MessageReceived(event, prefix, text, _, sendBy,...)
 			local state = ATT.SearchForLink(text)[1].collected
 			if state ~= 1 then
 				if Kleiderschrank:isBoP(text) then
-					if CanIMogIt:CharacterCanLearnTransmog(text) then	
+					if CanIMogIt:CharacterCanLearnTransmog(text) then
 						status = true
 						print(text, GetCollectionText(state))
 					end
@@ -147,11 +172,14 @@ function K:SendItems(target, offer)
 						if itemClassID == 2 or itemClassID == 4 then
 							if itemRarity > 1 then
 								local itemID = C_Item.GetItemID(itemLocation)
-								if select(3, C_Transmog.GetItemInfo(itemID)) then
-									if ATT.SearchForLink(itemLink)[1].collected or (Kleiderschrank:isBoP(itemLink) and not CanIMogIt:CharacterCanLearnTransmog(itemLink)) then
+								if select(3, C_Transmog.CanTransmogItem(itemID)) then
+									if
+										ATT.SearchForLink(itemLink)[1].collected or
+											(Kleiderschrank:isBoP(itemLink) and not CanIMogIt:CharacterCanLearnTransmog(itemLink))
+									 then
 										n = n + 1
 										if offer then
-											SendAddonMessage("Kleiderschrank", "OFFER"..itemLink, "WHISPER", target)
+											SendAddonMessage("Kleiderschrank", "OFFER" .. itemLink, "WHISPER", target)
 										else
 											SendAddonMessage("Kleiderschrank", itemLink, "WHISPER", target)
 										end
@@ -164,7 +192,7 @@ function K:SendItems(target, offer)
 			end
 		end
 	end
-	SendAddonMessage("Kleiderschrank", "N|"..n, "WHISPER", target)
+	SendAddonMessage("Kleiderschrank", "N|" .. n, "WHISPER", target)
 	if n == 0 then
 		if offer then
 			print(L["NOTHING"])
@@ -178,15 +206,22 @@ function K:OfferItems(target)
 	self:SendItems(target, true)
 end
 
-
-
 Kleiderschrank.events = CreateFrame("Frame")
-Kleiderschrank.events:SetScript("OnEvent", function(self, event)
-	if event == "MAIL_SEND_SUCCESS" then
-		self:UnregisterEvent("MAIL_SEND_SUCCESS")
-		local timerMail = C_Timer.After(.5, function() Kleiderschrank:SendMail() end)
+Kleiderschrank.events:SetScript(
+	"OnEvent",
+	function(self, event)
+		if event == "MAIL_SEND_SUCCESS" then
+			self:UnregisterEvent("MAIL_SEND_SUCCESS")
+			local timerMail =
+				C_Timer.After(
+				.5,
+				function()
+					Kleiderschrank:SendMail()
+				end
+			)
+		end
 	end
-end)
+)
 
 Kleiderschrank.events:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
 
@@ -213,24 +248,23 @@ Kleiderschrank.events:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	["Verschiedenes"] = "Sanador",
 	["Kriegsgleven"] = "Lollêk-Khaz'goroth",
 }--]]
-
 --http://www.wowinterface.com/forums/showpost.php?p=303924&postcount=3
-local tip = CreateFrame("GameTooltip","Tooltip",nil,"GameTooltipTemplate")
+local tip = CreateFrame("GameTooltip", "Tooltip", nil, "GameTooltipTemplate")
 local function SearchTooltip(bag, slot, s)
-    tip:SetOwner(UIParent, "ANCHOR_NONE")
-    tip:SetBagItem(bag, slot)
-    tip:Show()
-    for i = 1,tip:NumLines() do
-        if(_G["TooltipTextLeft"..i]:GetText() == s) then
-            return true
-        end
-    end
-		
-    tip:Hide()
-    return false
+	tip:SetOwner(UIParent, "ANCHOR_NONE")
+	tip:SetBagItem(bag, slot)
+	tip:Show()
+	for i = 1, tip:NumLines() do
+		if (_G["TooltipTextLeft" .. i]:GetText() == s) then
+			return true
+		end
+	end
+
+	tip:Hide()
+	return false
 end
 
-local function IsUnknown (bag, slot)
+local function IsUnknown(bag, slot)
 	return SearchTooltip(bag, slot, TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)
 end
 
@@ -238,7 +272,7 @@ local function IsSoulbound(bag, slot)
 	return SearchTooltip(bag, slot, ITEM_SOULBOUND)
 end
 
---ITEM_BIND_ON_PICKUP 
+--ITEM_BIND_ON_PICKUP
 
 --/run for k,v in pairs(_G) do if type(v) == "string" then if string.find(v, "Für die nächsten") then print(k,v) end end end
 
@@ -246,14 +280,14 @@ function Kleiderschrank:isBoP(itemLink)
 	tip:SetOwner(UIParent, "ANCHOR_NONE")
 	tip:SetHyperlink(itemLink)
 	tip:Show()
-	for i = 1,tip:NumLines() do
-		if _G["TooltipTextLeft"..i]:GetText() == ITEM_BIND_ON_PICKUP then
+	for i = 1, tip:NumLines() do
+		if _G["TooltipTextLeft" .. i]:GetText() == ITEM_BIND_ON_PICKUP then
 			return true
 		end
 	end
-	
+
 	tip:Hide()
-    return false
+	return false
 end
 
 function Kleiderschrank:isTradable(itemLocation)
@@ -261,15 +295,15 @@ function Kleiderschrank:isTradable(itemLocation)
 	tip:SetOwner(UIParent, "ANCHOR_NONE")
 	tip:SetBagItem(itemLocation:GetBagAndSlot())
 	tip:Show()
-	for i = 1,tip:NumLines() do
+	for i = 1, tip:NumLines() do
 		--print(i, _G["TooltipTextLeft"..i]:GetText())
-		if(string.find(_G["TooltipTextLeft"..i]:GetText(), string.format(BIND_TRADE_TIME_REMAINING, ".*"))) then
+		if (string.find(_G["TooltipTextLeft" .. i]:GetText(), string.format(BIND_TRADE_TIME_REMAINING, ".*"))) then
 			return true
 		end
 	end
-	
+
 	tip:Hide()
-    return false
+	return false
 end
 
 local cache = {}
@@ -284,13 +318,15 @@ end
 function Kleiderschrank:Equip()
 	for bag = 0, 4 do
 		for slot = 1, GetContainerNumSlots(bag) do
-			local  itemLink = GetContainerItemLink(bag, slot)
+			local itemLink = GetContainerItemLink(bag, slot)
 			if itemLink ~= nil then
 				if CanIMogIt:IsEquippable(itemLink) then
-					if CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) == false and CanIMogIt:CharacterCanLearnTransmog(itemLink) == true then
+					if
+						CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) == false and CanIMogIt:CharacterCanLearnTransmog(itemLink) == true
+					 then
 						EquipItemByName(itemLink)
 						StaticPopup1Button1:Click()
-						local _,_,_,_,_,_,_,_, equipSlot = GetItemInfo(itemLink)
+						local _, _, _, _, _, _, _, _, equipSlot = GetItemInfo(itemLink)
 						if not cache[equipSlot] then
 							cache[equipSlot] = {bag, slot}
 						end
@@ -299,7 +335,13 @@ function Kleiderschrank:Equip()
 			end
 		end
 	end
-	local timer = C_Timer.After(1, function() EquipOldItems() end)
+	local timer =
+		C_Timer.After(
+		1,
+		function()
+			EquipOldItems()
+		end
+	)
 end
 
 function Kleiderschrank:Sell()
@@ -308,7 +350,7 @@ function Kleiderschrank:Sell()
 		for slot = 1, GetContainerNumSlots(bag) do
 			if GetContainerItemLink(bag, slot) ~= nil then
 				if IsSoulbound(bag, slot) then
-					local _,_,_,_,_, itemType, itemSubType,_,_,_, vendorPrice = GetItemInfo(GetContainerItemLink(bag, slot))
+					local _, _, _, _, _, itemType, itemSubType, _, _, _, vendorPrice = GetItemInfo(GetContainerItemLink(bag, slot))
 					if (itemType == "Rüstung" or itemType == "Waffe") and vendorPrice > 0 then
 						if not IsUnknown(bag, slot) then
 							UseContainerItem(bag, slot)
@@ -360,7 +402,7 @@ function Kleiderschrank:Stocktake()
 					if not IsSoulbound(bag, slot) then
 						if CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) == false then
 							if not CanIMogIt:CharacterCanLearnTransmog(itemLink) then
-								local _,_, itemQuality,_,_, itemType, itemSubType = GetItemInfo(itemLink)
+								local _, _, itemQuality, _, _, itemType, itemSubType = GetItemInfo(itemLink)
 								if itemQuality > 1 then
 									local t = itemList[config[itemSubType]]
 									if not t then
@@ -368,10 +410,10 @@ function Kleiderschrank:Stocktake()
 										t[1] = {}
 									end
 									if table.getn(t[table.getn(t)]) == 12 then
-										t[table.getn(t)+1] = {}
+										t[table.getn(t) + 1] = {}
 										t[table.getn(t)][1] = {bag, slot}
 									else
-										t[table.getn(t)][table.getn(t[table.getn(t)])+1] = {bag, slot}
+										t[table.getn(t)][table.getn(t[table.getn(t)]) + 1] = {bag, slot}
 									end
 									itemList[config[itemSubType]] = t
 								end
@@ -391,10 +433,14 @@ Kleiderschrank.MailButton:SetPoint("TOPRIGHT", MailFrame, "BOTTOMRIGHT", -5, -5)
 Kleiderschrank.MailButton:SetWidth(100)
 Kleiderschrank.MailButton:SetHeight(21)
 Kleiderschrank.MailButton:SetText("Kleiderschrank")
-Kleiderschrank.MailButton:SetScript("OnClick", function(_, button)
-	if button == "LeftButton" then
-		Kleiderschrank:Stocktake()
-	end end)
+Kleiderschrank.MailButton:SetScript(
+	"OnClick",
+	function(_, button)
+		if button == "LeftButton" then
+			Kleiderschrank:Stocktake()
+		end
+	end
+)
 
 --Equip button
 Kleiderschrank.EquipButton = CreateFrame("Button", "KleiderschrankEquipButton", CharacterFrame, "UIPanelButtonTemplate")
@@ -402,12 +448,14 @@ Kleiderschrank.EquipButton:SetPoint("TOPRIGHT", CharacterFrame, "BOTTOMRIGHT", -
 Kleiderschrank.EquipButton:SetWidth(100)
 Kleiderschrank.EquipButton:SetHeight(21)
 Kleiderschrank.EquipButton:SetText("Kleiderschrank")
-Kleiderschrank.EquipButton:SetScript("OnClick", function(_, button)
-	if button == "LeftButton" then
-		Kleiderschrank:Equip()
-	end end)
-
-
+Kleiderschrank.EquipButton:SetScript(
+	"OnClick",
+	function(_, button)
+		if button == "LeftButton" then
+			Kleiderschrank:Equip()
+		end
+	end
+)
 
 --[[
 function Kleiderschrank_Mail(k)
@@ -448,27 +496,26 @@ function Kleiderschrank_Mail(k)
 		end
 	end
 end]]
-
 local InventorySlots = {
-    ['INVTYPE_HEAD'] = 1,
-    ['INVTYPE_NECK'] = 2,
-    ['INVTYPE_SHOULDER'] = 3,
-    ['INVTYPE_BODY'] = 4,
-    ['INVTYPE_CHEST'] = 5,
-    ['INVTYPE_ROBE'] = 5,
-    ['INVTYPE_WAIST'] = 6,
-    ['INVTYPE_LEGS'] = 7,
-    ['INVTYPE_FEET'] = 8,
-    ['INVTYPE_WRIST'] = 9,
-    ['INVTYPE_HAND'] = 10,
-    ['INVTYPE_CLOAK'] = 15,
-    ['INVTYPE_WEAPON'] = 16,
-    ['INVTYPE_SHIELD'] = 17,
-    ['INVTYPE_2HWEAPON'] = 16,
-    ['INVTYPE_WEAPONMAINHAND'] = 16,
-    ['INVTYPE_RANGED'] = 16,
-    ['INVTYPE_RANGEDRIGHT'] = 16,
-    ['INVTYPE_WEAPONOFFHAND'] = 17,
-    ['INVTYPE_HOLDABLE'] = 17,
-    -- ['INVTYPE_TABARD'] = 19,
+	["INVTYPE_HEAD"] = 1,
+	["INVTYPE_NECK"] = 2,
+	["INVTYPE_SHOULDER"] = 3,
+	["INVTYPE_BODY"] = 4,
+	["INVTYPE_CHEST"] = 5,
+	["INVTYPE_ROBE"] = 5,
+	["INVTYPE_WAIST"] = 6,
+	["INVTYPE_LEGS"] = 7,
+	["INVTYPE_FEET"] = 8,
+	["INVTYPE_WRIST"] = 9,
+	["INVTYPE_HAND"] = 10,
+	["INVTYPE_CLOAK"] = 15,
+	["INVTYPE_WEAPON"] = 16,
+	["INVTYPE_SHIELD"] = 17,
+	["INVTYPE_2HWEAPON"] = 16,
+	["INVTYPE_WEAPONMAINHAND"] = 16,
+	["INVTYPE_RANGED"] = 16,
+	["INVTYPE_RANGEDRIGHT"] = 16,
+	["INVTYPE_WEAPONOFFHAND"] = 17,
+	["INVTYPE_HOLDABLE"] = 17
+	-- ['INVTYPE_TABARD'] = 19,
 }
