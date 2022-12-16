@@ -162,7 +162,7 @@ end
 function K:SendItems(target, offer)
 	local n = 0
 	for bagID = 0, 4 do
-		for slotID = 1, GetContainerNumSlots(bagID) do
+		for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
 			local itemLocation = ItemLocation:CreateFromBagAndSlot(bagID, slotID)
 			if C_Item.DoesItemExist(itemLocation) then
 				if not C_Item.IsBound(itemLocation) or Kleiderschrank:isTradable(itemLocation) then
@@ -225,29 +225,6 @@ Kleiderschrank.events:SetScript(
 
 Kleiderschrank.events:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
 
---[[{
-	["Stoff"] = "Sanador",
-	["Leder"] = "Capra",
-	["Kette"] = "María",
-	["Platte"] = "Urtgard",
-	["Zweihandschwerter"] = "Urtgard",
-	["Stäbe"] = "Urtgard",
-	["Faustwaffen"] = "Urtgard",
-	["Zweihandäxte"] = "Urtgard",
-	["Dolche"] = "Urtgard",
-	["Zweihandstreitkolben"] = "Urtgard",
-	["Schusswaffen"] = "María",
-	["Einhandschwerter"] = "Urtgard",
-	["Zauberstäbe"] = "Sanador",
-	["Armbrüste"] = "María",
-	["Bogen"] = "María",
-	["Stangenwaffen"] = "Urtgard",
-	["Einhandäxte"] = "Urtgard",
-	["Einhandstreitkolben"] = "Urtgard",
-	["Schilde"] = "Urtgard",
-	["Verschiedenes"] = "Sanador",
-	["Kriegsgleven"] = "Lollêk-Khaz'goroth",
-}--]]
 --http://www.wowinterface.com/forums/showpost.php?p=303924&postcount=3
 local tip = CreateFrame("GameTooltip", "Tooltip", nil, "GameTooltipTemplate")
 local function SearchTooltip(bag, slot, s)
@@ -310,15 +287,15 @@ local cache = {}
 
 local function EquipOldItems()
 	for i, v in pairs(cache) do
-		EquipItemByName(GetContainerItemLink(unpack(v)))
+		EquipItemByName(C_Container.GetContainerItemLink(unpack(v)))
 	end
 	cache = {}
 end
 
 function Kleiderschrank:Equip()
 	for bag = 0, 4 do
-		for slot = 1, GetContainerNumSlots(bag) do
-			local itemLink = GetContainerItemLink(bag, slot)
+		for slot = 1, C_Container.GetContainerNumSlots(bag) do
+			local itemLink = C_Container.GetContainerItemLink(bag, slot)
 			if itemLink ~= nil then
 				if CanIMogIt:IsEquippable(itemLink) then
 					if
@@ -347,10 +324,11 @@ end
 function Kleiderschrank:Sell()
 	local i = 0
 	for bag = 0, 4 do
-		for slot = 1, GetContainerNumSlots(bag) do
-			if GetContainerItemLink(bag, slot) ~= nil then
+		for slot = 1, C_Container.GetContainerNumSlots(bag) do
+			if C_Container.GetContainerItemLink(bag, slot) ~= nil then
 				if IsSoulbound(bag, slot) then
-					local _, _, _, _, _, itemType, itemSubType, _, _, _, vendorPrice = GetItemInfo(GetContainerItemLink(bag, slot))
+					local _, _, _, _, _, itemType, itemSubType, _, _, _, vendorPrice =
+						GetItemInfo(C_Container.GetContainerItemLink(bag, slot))
 					if (itemType == "Rüstung" or itemType == "Waffe") and vendorPrice > 0 then
 						if not IsUnknown(bag, slot) then
 							UseContainerItem(bag, slot)
@@ -376,8 +354,8 @@ function Kleiderschrank:SendMail()
 			for ii, vv in pairs(vvv) do
 				print("--------")
 				for i, v in pairs(vv) do
-					print(GetContainerItemLink(unpack(v)))
-					PickupContainerItem(unpack(v))
+					print(C_Container.GetContainerItemLink(unpack(v)))
+					C_Container.PickupContainerItem(unpack(v))
 					ClickSendMailItemButton()
 					itemList[iii][ii][i] = nil
 				end
@@ -395,8 +373,8 @@ function Kleiderschrank:Stocktake()
 	local config = K.db.factionrealm
 	itemList = {}
 	for bag = 0, 4 do
-		for slot = 1, GetContainerNumSlots(bag) do
-			local itemLink = GetContainerItemLink(bag, slot)
+		for slot = 1, C_Container.GetContainerNumSlots(bag) do
+			local itemLink = C_Container.GetContainerItemLink(bag, slot)
 			if itemLink ~= nil then
 				if CanIMogIt:IsEquippable(itemLink) then
 					if not IsSoulbound(bag, slot) then
@@ -457,45 +435,6 @@ Kleiderschrank.EquipButton:SetScript(
 	end
 )
 
---[[
-function Kleiderschrank_Mail(k)
-	local i = 0
-	for j = k or 0, table.getn(config) do
-		if config[j].char ~= "" and config[j].char ~= UnitName("player") and config[j].char ~= UnitName("player").."-"..GetRealmName() then
-			for bag = 0, 4 do
-				for slot = 1, GetContainerNumSlots(bag) do
-					if GetContainerItemLink(bag, slot) ~= nil then
-						if not IsSoulbound(bag, slot) then
-							if CanIMogIt:IsEquippable(GetContainerItemLink(bag, slot)) then
-								if CanIMogIt:PlayerKnowsTransmog(GetContainerItemLink(bag, slot)) == false and CanIMogIt:CharacterCanLearnTransmog(GetContainerItemLink(bag, slot)) == false then
-									local _,_,_,_,_, itemType, itemSubType = GetItemInfo(GetContainerItemLink(bag, slot))
-									if (itemType == "Rüstung" or itemType == "Waffe") and itemSubType == config[j].type then
-										print(GetContainerItemLink(bag, slot))
-										PickupContainerItem(bag, slot)
-										ClickSendMailItemButton()
-										i = i + 1
-										if i == 12 then
-											events:RegisterEvent("MAIL_SEND_SUCCESS")
-											k = j
-										--	SendMail(config[j].char, config[j].type)
-										--	return nil
-										end
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-			if i ~= 0 then
-				events:RegisterEvent("MAIL_SEND_SUCCESS")
-				k = j + 1
-				--SendMail(config[j].char, config[j].type)
-				--return nil
-			end
-		end
-	end
-end]]
 local InventorySlots = {
 	["INVTYPE_HEAD"] = 1,
 	["INVTYPE_NECK"] = 2,
