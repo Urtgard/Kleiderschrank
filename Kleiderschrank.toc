@@ -3,7 +3,6 @@
 ## Author: Urtgard
 ## Version: @project-version@
 ## X-Curse-Project-ID: 388565
-## X-WoWI-ID: 26204
 ## SavedVariables: KleiderschrankDB
 ## Dependencies: CanIMogIt, AllTheThings
 
