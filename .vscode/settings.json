@@ -1,0 +1,11 @@
+{
+    "Lua.diagnostics.globals": [
+        "MailFrame",
+        "CharacterFrame",
+        "TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN",
+        "ITEM_SOULBOUND",
+        "ITEM_BIND_ON_PICKUP",
+        "BIND_TRADE_TIME_REMAINING",
+        "StaticPopup1Button1"
+    ]
+}

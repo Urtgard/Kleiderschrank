@@ -37,9 +37,9 @@ end
 
 -- AllTheThings
 local L = {
-	["COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\known:0|t |cff15abffCollected|r", -- Acquired the colors and icon from CanIMogIt.
+	["COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\known:0|t |cff15abffCollected|r",                 -- Acquired the colors and icon from CanIMogIt.
 	["COLLECTED_APPEARANCE"] = "|TInterface\\Addons\\AllTheThings\\assets\\known_circle:0|t |cff15abffCollected*|r", -- Acquired the colors and icon from CanIMogIt.
-	["NOT_COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t |cffff9333Not Collected|r", -- Acquired the colors and icon from CanIMogIt.
+	["NOT_COLLECTED"] = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t |cffff9333Not Collected|r",       -- Acquired the colors and icon from CanIMogIt.
 	["NOTHING"] = "Keine Items zum Tauschen"
 }
 
@@ -118,11 +118,13 @@ function K:MessageReceived(event, prefix, text, _, sendBy, ...)
 				if Kleiderschrank:isBoP(text) then
 					if CanIMogIt:CharacterCanLearnTransmog(text) then
 						status = true
-						SendAddonMessage("Kleiderschrank", "ANSWER" .. text .. " " .. GetCollectionText(state), "WHISPER", sendBy)
+						SendAddonMessage("Kleiderschrank", "ANSWER" .. text .. " " .. GetCollectionText(state), "WHISPER",
+							sendBy)
 					end
 				else
 					status = true
-					SendAddonMessage("Kleiderschrank", "ANSWER" .. text .. " " .. GetCollectionText(state), "WHISPER", sendBy)
+					SendAddonMessage("Kleiderschrank", "ANSWER" .. text .. " " .. GetCollectionText(state), "WHISPER",
+						sendBy)
 				end
 			end
 		elseif select(3, string.find(text, "ANSWER(.*)")) then
@@ -175,8 +177,8 @@ function K:SendItems(target, offer)
 								if select(3, C_Transmog.CanTransmogItem(itemID)) then
 									if
 										ATT.SearchForLink(itemLink)[1].collected or
-											(Kleiderschrank:isBoP(itemLink) and not CanIMogIt:CharacterCanLearnTransmog(itemLink))
-									 then
+										(Kleiderschrank:isBoP(itemLink) and not CanIMogIt:CharacterCanLearnTransmog(itemLink))
+									then
 										n = n + 1
 										if offer then
 											SendAddonMessage("Kleiderschrank", "OFFER" .. itemLink, "WHISPER", target)
@@ -214,11 +216,11 @@ Kleiderschrank.events:SetScript(
 			self:UnregisterEvent("MAIL_SEND_SUCCESS")
 			local timerMail =
 				C_Timer.After(
-				.5,
-				function()
-					Kleiderschrank:SendMail()
-				end
-			)
+					.5,
+					function()
+						Kleiderschrank:SendMail()
+					end
+				)
 		end
 	end
 )
@@ -273,8 +275,12 @@ function Kleiderschrank:isTradable(itemLocation)
 	tip:SetBagItem(itemLocation:GetBagAndSlot())
 	tip:Show()
 	for i = 1, tip:NumLines() do
-		--print(i, _G["TooltipTextLeft"..i]:GetText())
-		if (string.find(_G["TooltipTextLeft" .. i]:GetText(), string.format(BIND_TRADE_TIME_REMAINING, ".*"))) then
+		local text = _G["TooltipTextLeft" .. i]:GetText()
+		local pattern = ".*" .. string.format(BIND_TRADE_TIME_REMAINING, ".*") .. ".*"
+		pattern = string.gsub(pattern, "%(", "%%(")
+		pattern = string.gsub(pattern, "%)", "%%)")
+
+		if (string.find(text, pattern)) then
 			return true
 		end
 	end
@@ -300,12 +306,12 @@ function Kleiderschrank:Equip()
 				if CanIMogIt:IsEquippable(itemLink) then
 					if
 						CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) == false and CanIMogIt:CharacterCanLearnTransmog(itemLink) == true
-					 then
+					then
 						EquipItemByName(itemLink)
 						StaticPopup1Button1:Click()
 						local _, _, _, _, _, _, _, _, equipSlot = GetItemInfo(itemLink)
 						if not cache[equipSlot] then
-							cache[equipSlot] = {bag, slot}
+							cache[equipSlot] = { bag, slot }
 						end
 					end
 				end
@@ -314,11 +320,11 @@ function Kleiderschrank:Equip()
 	end
 	local timer =
 		C_Timer.After(
-		1,
-		function()
-			EquipOldItems()
-		end
-	)
+			1,
+			function()
+				EquipOldItems()
+			end
+		)
 end
 
 function Kleiderschrank:Sell()
@@ -389,9 +395,9 @@ function Kleiderschrank:Stocktake()
 									end
 									if table.getn(t[table.getn(t)]) == 12 then
 										t[table.getn(t) + 1] = {}
-										t[table.getn(t)][1] = {bag, slot}
+										t[table.getn(t)][1] = { bag, slot }
 									else
-										t[table.getn(t)][table.getn(t[table.getn(t)]) + 1] = {bag, slot}
+										t[table.getn(t)][table.getn(t[table.getn(t)]) + 1] = { bag, slot }
 									end
 									itemList[config[itemSubType]] = t
 								end
