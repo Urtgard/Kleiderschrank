@@ -170,9 +170,8 @@ function K:SendItems(target, offer)
 				if not C_Item.IsBound(itemLocation) or Kleiderschrank:isTradable(itemLocation) then
 					local itemLink = C_Item.GetItemLink(itemLocation)
 					if itemLink ~= nil and CanIMogIt:IsTransmogable(itemLink) then
-						local _, _, itemRarity, _, _, _, _, _, _, _, _, itemClassID = GetItemInfo(itemLink)
+						local _, _, _, _, _, _, _, _, _, _, _, itemClassID = GetItemInfo(itemLink)
 						if itemClassID == 2 or itemClassID == 4 then
-							if itemRarity > 1 then
 								local itemID = C_Item.GetItemID(itemLocation)
 								if select(3, C_Transmog.CanTransmogItem(itemID)) then
 									if
@@ -185,7 +184,6 @@ function K:SendItems(target, offer)
 										else
 											SendAddonMessage("Kleiderschrank", itemLink, "WHISPER", target)
 										end
-									end
 								end
 							end
 						end
@@ -386,8 +384,7 @@ function Kleiderschrank:Stocktake()
 					if not IsSoulbound(bag, slot) then
 						if CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) == false then
 							if not CanIMogIt:CharacterCanLearnTransmog(itemLink) then
-								local _, _, itemQuality, _, _, itemType, itemSubType = GetItemInfo(itemLink)
-								if itemQuality > 1 then
+								local _, _, _, _, _, itemType, itemSubType = GetItemInfo(itemLink)
 									local t = itemList[config[itemSubType]]
 									if not t then
 										t = {}
@@ -400,7 +397,6 @@ function Kleiderschrank:Stocktake()
 										t[table.getn(t)][table.getn(t[table.getn(t)]) + 1] = { bag, slot }
 									end
 									itemList[config[itemSubType]] = t
-								end
 							end
 						end
 					end
